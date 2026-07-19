@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::selection { background: #ffffff; color: #0a0a0a; }
+  a { color: inherit; text-decoration: none; }
+  @keyframes grainShift {
+    0%,100% { transform:translate(0,0); } 10%{transform:translate(-1%,-1%);} 20%{transform:translate(1%,1%);}
+    30%{transform:translate(-1%,1%);} 40%{transform:translate(1%,-1%);} 50%{transform:translate(-1%,0);}
+    60%{transform:translate(1%,0);} 70%{transform:translate(0,1%);} 80%{transform:translate(0,-1%);} 90%{transform:translate(1%,1%);}
+  }
+  @keyframes glowDriftA { 0%,100% { transform:translate(0,0) scale(1); opacity:0.9; } 50% { transform:translate(60px,40px) scale(1.15); opacity:0.6; } }
+  @keyframes glowDriftB { 0%,100% { transform:translate(0,0) scale(1); opacity:0.7; } 50% { transform:translate(-50px,-30px) scale(1.1); opacity:1; } }
+  .grain-layer { position:fixed; inset:-10%; background-image:radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size:3px 3px; opacity:0.5; animation:grainShift 1s steps(6) infinite; pointer-events:none; mix-blend-mode:overlay; z-index:1; }
+  .scroll-progress { position:fixed; top:0; left:0; height:3px; width:0%; background:var(--accent); z-index:9998; }
+  .link-fade { color:#9a9a9a; transition:color .3s ease, text-shadow .3s ease; }
+  .link-fade:hover { color: var(--accent); text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .lang-toggle { position:fixed; bottom:16px; right:16px; z-index:9997; display:flex; gap:2px; background:rgba(15,15,15,0.7); backdrop-filter:blur(6px); border:1px solid #262626; border-radius:999px; padding:3px; }
+  .lang-btn { border:none; background:transparent; color:#7a7a7a; font-size:11px; letter-spacing:0.06em; padding:5px 11px; border-radius:999px; cursor:pointer; font-family:inherit; transition:color .25s ease, background .25s ease; }
+  .lang-btn:hover { color:#e6e6e6; }
+  .lang-btn[data-active="true"] { background:var(--accent); color:#0a0a0a; font-weight:600; }
+  @media (max-width: 720px) {
+    .gallery-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+</helmet>
+<div style="background:#0a0a0a; color:#ffffff; font-family:'Space Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif; min-height:100vh; position:relative; overflow-x:hidden; background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:48px 48px; --accent:{{ accentColor }}; z-index:0;">
+  <div class="grain-layer"></div>
+  <div class="scroll-progress" ref="{{ setProgressRef }}"></div>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-active="{{ isRu }}" onClick="{{ setLangRu }}">RU</button>
+    <button class="lang-btn" data-active="{{ isEn }}" onClick="{{ setLangEn }}">EN</button>
+  </div>
+  <div style="position:absolute; top:-140px; right:-100px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}22, transparent 70%); filter:blur(60px); pointer-events:none; animation:glowDriftA 10s ease-in-out infinite; z-index:-1;"></div>
+  <div style="position:absolute; top:900px; left:-140px; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}16, transparent 70%); filter:blur(70px); pointer-events:none; animation:glowDriftB 12s ease-in-out infinite; z-index:-1;"></div>
+
+  <header style="padding:32px clamp(20px,5vw,64px);">
+    <a href="./Works.dc.html" class="link-fade" style="font-size:12px; letter-spacing:0.12em; text-transform:uppercase;">&larr; {{ t.selectedWork }}</a>
+  </header>
+
+  <section style="max-width:900px; margin:0 auto; padding:20px clamp(20px,5vw,64px) 60px;">
+    <div style="font-size:13px; color:#7a7a7a; letter-spacing:0.06em; margin-bottom:16px;">2026</div>
+    <h1 style="font-size:clamp(36px,6vw,64px); font-weight:700; margin:0 0 24px;">KohiAnime</h1>
+    <p style="font-size:17px; line-height:1.7; color:#c4c4c4; margin:0 0 12px; max-width:60ch;">{{ t.description1 }}</p>
+    <p style="font-size:15px; line-height:1.7; color:#8a8a8a; margin:0 0 28px; max-width:60ch;">{{ t.description2 }}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px;">
+      <sc-for list="{{ stack }}" as="s" hint-placeholder-count="6">
+        <span style="font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:#c9c9c9; border:1px solid #2a2a2a; border-radius:999px; padding:6px 12px;">{{ s }}</span>
+      </sc-for>
+    </div>
+    <a href="https://gitlab.com/django_pet_project1/KohiAnime" target="_blank" rel="noopener" style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:{{ accentColor }};">{{ t.viewRepo }}</a>
+  </section>
+
+  <section style="max-width:900px; margin:0 auto; padding:0 clamp(20px,5vw,64px) 60px;">
+    <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#7a7a7a; margin-bottom:20px;">{{ t.features }}</div>
+    <ul style="margin:0; padding:0 0 0 20px; display:flex; flex-direction:column; gap:14px;">
+      <sc-for list="{{ features }}" as="f" hint-placeholder-count="6">
+        <li style="font-size:16px; line-height:1.6; color:#c4c4c4;">{{ f }}</li>
+      </sc-for>
+    </ul>
+  </section>
+
+  <section style="max-width:1100px; margin:0 auto; padding:0 clamp(20px,5vw,64px) 140px;">
+    <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#7a7a7a; margin-bottom:20px;">{{ t.gallery }}</div>
+    <div class="gallery-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="5">
+        <div style="width:100%; aspect-ratio:16/9; overflow:hidden; border:1px solid #262626;">
+          <image-slot id="{{ g.id }}" shape="rect" fit="contain" placeholder="Drop screenshot" src="{{ g.src }}" style="width:100%; height:100%; display:block;"></image-slot>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#D4FF3F&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#D4FF3F&quot;,&quot;#7FFFD4&quot;,&quot;#FF5C38&quot;,&quot;#9B9B9B&quot;]}}">
+const STACK = ['Django', 'Django Templates', 'Bootstrap', 'PostgreSQL', 'CI/CD', 'flake8', 'black'];
+const GALLERY = [
+  { id: 'kohi-1', src: './assets/kohianime.png' },
+  { id: 'kohi-2', src: './assets/kohianime-catalog.png' },
+  { id: 'kohi-3', src: './assets/kohianime-detail.png' },
+  { id: 'kohi-4', src: './assets/kohianime-about.png' },
+  { id: 'kohi-5', src: './assets/kohianime-login.png' },
+  { id: 'kohi-6', src: './assets/kohianime-title-detail.png' }
+];
+
+const TRANSLATIONS = {
+  ru: {
+    selectedWork: 'Избранные работы',
+    viewRepo: 'Репозиторий →',
+    features: 'Идеи и фишки',
+    gallery: 'Галерея',
+    description1: 'Каталог аниме на Django с фильтрами, пользовательскими профилями и кастомной админкой — первый крупный проект, сделанный в рамках Django-курса (Яндекс, ~3 месяца).',
+    description2: 'Учебный проект, доведённый до рабочего состояния (каталог, фильтры, профили, админка, дизайн) — стартовая точка для перехода к Sprint Task Tracker, где решения уже принимались самостоятельно.',
+    features_list: [
+      'Архитектура с нуля: несколько Django-приложений, .env-конфигурация, разделённые зависимости под prod/test/dev.',
+      'Кастомный middleware — нестандартная логика на уровне обработки запросов/ответов (каждый 10-й ответ переворачивает русские слова).',
+      'Модели с валидацией и связями — Item, Tag, Category с кастомными валидаторами.',
+      'Кастомизация Django Admin — list_display, list_editable, filter_horizontal, локализация под русский язык.',
+      'Расширение модели пользователя через профиль 1:1 — регистрация, вход, редактирование профиля, аватары.',
+      'CI/CD с первого дня — flake8, black и pep8-плагины в пайплайне.'
+    ]
+  },
+  en: {
+    selectedWork: 'Selected Work',
+    viewRepo: 'View repository →',
+    features: 'Ideas & Features',
+    gallery: 'Gallery',
+    description1: 'An anime catalog built on Django with filters, user profiles, and a custom admin — my first large project, built during a Django course (Yandex, ~3 months).',
+    description2: 'A learning project brought to a working state (catalog, filters, profiles, admin, design) — the starting point for moving on to Sprint Task Tracker, where decisions were made independently.',
+    features_list: [
+      'Architecture from scratch: several Django apps, .env configuration, split dependencies for prod/test/dev.',
+      'Custom middleware — non-standard request/response handling logic (every 10th response reverses Russian words).',
+      'Models with validation and relations — Item, Tag, Category with custom validators.',
+      'Django Admin customization — list_display, list_editable, filter_horizontal, localized to Russian.',
+      'Extended the user model via a 1:1 profile — signup, login, profile editing, avatars.',
+      'CI/CD from day one — flake8, black, and pep8 plugins in the pipeline.'
+    ]
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: (typeof localStorage !== 'undefined' && localStorage.getItem('portfolio-lang')) || 'ru' };
+  setProgressRef = (node) => { this.progressEl = node; };
+  setLang = (lang) => {
+    this.setState({ lang });
+    if (typeof localStorage !== 'undefined') localStorage.setItem('portfolio-lang', lang);
+  };
+
+  componentDidMount() {
+    this.onScroll = () => {
+      if (!this.progressEl) return;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      this.progressEl.style.width = pct + '%';
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+  }
+
+  componentWillUnmount() {
+    if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+  }
+
+  renderVals() {
+    const lang = this.state.lang;
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
+    return {
+      setProgressRef: this.setProgressRef,
+      t: t,
+      isRu: lang === 'ru',
+      isEn: lang === 'en',
+      setLangRu: () => this.setLang('ru'),
+      setLangEn: () => this.setLang('en'),
+      stack: STACK,
+      features: t.features_list,
+      gallery: GALLERY,
+      accentColor: this.props.accentColor ?? '#D4FF3F'
+    };
+  }
+}
+</script>
+</body>
+</html>

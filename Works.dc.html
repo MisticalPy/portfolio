@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::selection { background: #ffffff; color: #0a0a0a; }
+  a { color: inherit; text-decoration: none; }
+  @keyframes grainShift {
+    0%,100% { transform:translate(0,0); } 10%{transform:translate(-1%,-1%);} 20%{transform:translate(1%,1%);}
+    30%{transform:translate(-1%,1%);} 40%{transform:translate(1%,-1%);} 50%{transform:translate(-1%,0);}
+    60%{transform:translate(1%,0);} 70%{transform:translate(0,1%);} 80%{transform:translate(0,-1%);} 90%{transform:translate(1%,1%);}
+  }
+  @keyframes glowDriftA { 0%,100% { transform:translate(0,0) scale(1); opacity:0.9; } 50% { transform:translate(60px,40px) scale(1.15); opacity:0.6; } }
+  @keyframes glowDriftB { 0%,100% { transform:translate(0,0) scale(1); opacity:0.7; } 50% { transform:translate(-50px,-30px) scale(1.1); opacity:1; } }
+  .grain-layer { position:fixed; inset:-10%; background-image:radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size:3px 3px; opacity:0.5; animation:grainShift 1s steps(6) infinite; pointer-events:none; mix-blend-mode:overlay; z-index:1; }
+  .scroll-progress { position:fixed; top:0; left:0; height:3px; width:0%; background:var(--accent); z-index:9998; }
+  .link-fade { color:#9a9a9a; transition:color .3s ease, text-shadow .3s ease; }
+  .link-fade:hover { color: var(--accent); text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .lang-toggle { position:fixed; bottom:16px; right:16px; z-index:9997; display:flex; gap:2px; background:rgba(15,15,15,0.7); backdrop-filter:blur(6px); border:1px solid #262626; border-radius:999px; padding:3px; }
+  .lang-btn { border:none; background:transparent; color:#7a7a7a; font-size:11px; letter-spacing:0.06em; padding:5px 11px; border-radius:999px; cursor:pointer; font-family:inherit; transition:color .25s ease, background .25s ease; }
+  .lang-btn:hover { color:#e6e6e6; }
+  .lang-btn[data-active="true"] { background:var(--accent); color:#0a0a0a; font-weight:600; }
+  @media (max-width: 780px) {
+    .work-row { grid-template-columns: 1fr !important; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+</helmet>
+<div ref="{{ setRootRef }}" style="background:#0a0a0a; color:#ffffff; font-family:'Space Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif; min-height:100vh; position:relative; overflow-x:hidden; background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:48px 48px; --accent:{{ accentColor }}; z-index:0;">
+  <div class="grain-layer"></div>
+  <div class="scroll-progress" ref="{{ setProgressRef }}"></div>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-active="{{ isRu }}" onClick="{{ setLangRu }}">RU</button>
+    <button class="lang-btn" data-active="{{ isEn }}" onClick="{{ setLangEn }}">EN</button>
+  </div>
+  <div style="position:absolute; top:-140px; left:-100px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}22, transparent 70%); filter:blur(60px); pointer-events:none; animation:glowDriftA 10s ease-in-out infinite; z-index:-1;"></div>
+  <div style="position:absolute; top:900px; right:-140px; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}18, transparent 70%); filter:blur(70px); pointer-events:none; animation:glowDriftB 12s ease-in-out infinite; z-index:-1;"></div>
+
+  <header style="display:flex; justify-content:space-between; align-items:center; padding:32px clamp(20px,5vw,64px); font-size:12px; letter-spacing:0.12em; text-transform:uppercase;">
+    <a href="./Portfolio.dc.html" class="link-fade">&larr; Alexey Gordeev</a>
+    <span style="color:#7a7a7a;">{{ t.selectedWork }}</span>
+  </header>
+
+  <section style="padding:40px clamp(20px,5vw,64px) 140px; display:flex; flex-direction:column; gap:clamp(80px,10vh,120px);">
+    <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
+      <div class="work-row" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:clamp(32px,5vw,64px); align-items:center;">
+        <a href="{{ p.detailUrl }}" style="width:100%; aspect-ratio:16/9; overflow:hidden; border:1px solid #262626; display:block;">
+          <image-slot id="{{ p.id }}" shape="rect" fit="contain" placeholder="Drop project preview" src="{{ p.img }}" style="width:100%; height:100%; display:block; transform:scale(1); transition:transform .6s ease;" style-hover="transform:scale(1.05);"></image-slot>
+        </a>
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div style="font-size:13px; color:#7a7a7a; letter-spacing:0.06em;">{{ p.year }}</div>
+          <a href="{{ p.detailUrl }}" class="link-fade" style="font-size:clamp(28px,4vw,48px); font-weight:600; color:#ffffff;">{{ p.title }}</a>
+          <p style="font-size:16px; line-height:1.6; color:#b4b4b4; margin:0; max-width:46ch;">{{ p.desc }}</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+            <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="5">
+              <span style="font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:#c9c9c9; border:1px solid #2a2a2a; border-radius:999px; padding:6px 12px;">{{ t }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:24px; margin-top:8px;">
+            <a href="{{ p.detailUrl }}" style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:{{ accentColor }};">{{ t.details }}</a>
+            <a href="{{ p.url }}" target="_blank" rel="noopener" class="link-fade" style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase;">{{ t.viewRepo }}</a>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#D4FF3F&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#D4FF3F&quot;,&quot;#7FFFD4&quot;,&quot;#FF5C38&quot;,&quot;#9B9B9B&quot;]}}">
+const PROJECTS = [
+  {
+    id: 'work-1',
+    title: 'Sprint Task Tracker',
+    year: '2026',
+    img: './assets/sprint-task-tracker.png',
+    url: 'https://gitlab.com/django_pet_project1/sprint-task-tracker',
+    detailUrl: './Project-SprintTaskTracker.dc.html',
+    descriptionRu: 'Fullstack pet-проект: трекер задач по спринтам с самостоятельно спроектированной архитектурой — JWT-аутентификация под SPA, Celery+Redis для фоновых задач, CI через GitHub Actions, интеграция с Anthropic API.',
+    descriptionEn: 'A fullstack pet project: a sprint task tracker with a self-designed architecture — JWT auth for an SPA setup, Celery+Redis for background jobs, CI via GitHub Actions, and an Anthropic API integration.',
+    tags: ['Django', 'DRF', 'Vue 3', 'Celery', 'Redis', 'Docker', 'JWT']
+  },
+  {
+    id: 'work-2',
+    title: 'KohiAnime',
+    year: '2026',
+    img: './assets/kohianime.png',
+    url: 'https://gitlab.com/django_pet_project1/KohiAnime',
+    detailUrl: './Project-KohiAnime.dc.html',
+    descriptionRu: 'Каталог аниме на Django с фильтрами, пользовательскими профилями и кастомной админкой. Первый крупный проект — архитектура с нуля, кастомный middleware, CI/CD с первого дня.',
+    descriptionEn: 'An anime catalog built on Django with filters, user profiles, and a custom admin. My first large project — architecture from scratch, a custom middleware, and CI/CD from day one.',
+    tags: ['Django', 'Bootstrap', 'CI/CD', 'PostgreSQL']
+  }
+];
+
+const TRANSLATIONS = {
+  ru: { selectedWork: 'Избранные работы', details: 'Подробнее →', viewRepo: 'Репозиторий →' },
+  en: { selectedWork: 'Selected Work', details: 'Details →', viewRepo: 'View repository →' }
+};
+
+class Component extends DCLogic {
+  state = { lang: (typeof localStorage !== 'undefined' && localStorage.getItem('portfolio-lang')) || 'ru' };
+  setRootRef = (node) => { this.rootEl = node; };
+  setProgressRef = (node) => { this.progressEl = node; };
+  setLang = (lang) => {
+    this.setState({ lang });
+    if (typeof localStorage !== 'undefined') localStorage.setItem('portfolio-lang', lang);
+  };
+
+  componentDidMount() {
+    this.onScroll = () => {
+      if (!this.progressEl) return;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      this.progressEl.style.width = pct + '%';
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+  }
+
+  componentWillUnmount() {
+    if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+  }
+
+  renderVals() {
+    const lang = this.state.lang;
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
+    const projects = PROJECTS.map((p) => ({ ...p, desc: lang === 'en' ? p.descriptionEn : p.descriptionRu }));
+    return {
+      setRootRef: this.setRootRef,
+      setProgressRef: this.setProgressRef,
+      t: t,
+      isRu: lang === 'ru',
+      isEn: lang === 'en',
+      setLangRu: () => this.setLang('ru'),
+      setLangEn: () => this.setLang('en'),
+      projects: projects,
+      accentColor: this.props.accentColor ?? '#D4FF3F'
+    };
+  }
+}
+</script>
+</body>
+</html>
