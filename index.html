@@ -195,7 +195,7 @@
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#D4FF3F&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#D4FF3F&quot;,&quot;#7FFFD4&quot;,&quot;#FF5C38&quot;,&quot;#9B9B9B&quot;]},&quot;revealStagger&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:40,&quot;min&quot;:20,&quot;max&quot;:100,&quot;step&quot;:5,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;gridColumns&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;2&quot;,&quot;options&quot;:[&quot;2&quot;,&quot;3&quot;,&quot;4&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#D4FF3F&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#D4FF3F&quot;,&quot;#7FFFD4&quot;,&quot;#FF5C38&quot;,&quot;#9B9B9B&quot;]},&quot;revealStagger&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:20,&quot;min&quot;:20,&quot;max&quot;:100,&quot;step&quot;:5,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;gridColumns&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;2&quot;,&quot;options&quot;:[&quot;2&quot;,&quot;3&quot;,&quot;4&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
 const LETTERS = [
   { ch:'P', d:'M15,132 L15,8 L62,8 C90,8 90,62 62,62 L15,62', x:0 },
   { ch:'O', d:'M50,8 C18,8 12,72 12,72 C12,72 18,132 50,132 C82,132 88,72 88,72 C88,72 82,8 50,8 Z', x:120 },
@@ -454,7 +454,7 @@ class Component extends DCLogic {
       window.__gsapRegistered = true;
     }
     const root = this.rootEl;
-    const staggerSec = (this.props.revealStagger ?? 40) / 1000;
+    const staggerSec = (this.props.revealStagger ?? 20) / 1000;
 
     // Effect 1: hand-drawn SVG title stroke reveal, letters overlap slightly
     const letterPaths = root.querySelectorAll('.hero-letter');
@@ -464,19 +464,19 @@ class Component extends DCLogic {
       p.style.strokeDashoffset = len;
     });
     const letterCount = letterPaths.length;
-    gsap.to(letterPaths, { strokeDashoffset: 0, duration: 1, ease: 'power1.inOut', stagger: 0.4, onComplete: () => this.onHeroDrawComplete() });
+    gsap.to(letterPaths, { strokeDashoffset: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1, onComplete: () => this.onHeroDrawComplete() });
     // safety net in case there are no letters (layer not ready yet)
     if (!letterCount) this.onHeroDrawComplete();
 
     // Effect 2: word-by-word flip reveal for the about paragraph
     const words = root.querySelectorAll('.flip-word');
-    gsap.set(words, { yPercent: 115 });
+    gsap.set(words, { yPercent: 115, opacity: 0 });
     if (typeof ScrollTrigger !== 'undefined') {
       ScrollTrigger.create({
         trigger: root.querySelector('.about-section'),
         start: 'top 75%',
         once: true,
-        onEnter: () => gsap.to(words, { yPercent: 0, duration: 0.9, ease: 'back.out(1.4)', stagger: staggerSec })
+        onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, duration: 0.55, ease: 'power4.out', stagger: staggerSec })
       });
 
       // Effect 3: scroll-triggered fade-up for sections and cards
