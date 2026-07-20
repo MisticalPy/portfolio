@@ -22,6 +22,21 @@
 <script src="./support.js"></script>
 </head>
 <body>
+<noscript>
+  <p><a href="./Works.dc.html">← Избранные работы</a></p>
+  <h1>Sprint Task Tracker</h1>
+  <p>Трекер задач по спринтам — основной pet-проект лета, сделан с нуля как полноценное fullstack-приложение, а не учебный туториал. Самостоятельно спроектированная архитектура: свой roadmap, разделение ответственности между Django и Vue, свой подход к деплою через Docker/CI.</p>
+  <p>Стек: Django, DRF, Vue 3, Celery, Redis, Docker, GitHub Actions, JWT, Anthropic API</p>
+  <h2>Идеи и фишки</h2>
+  <ul>
+    <li>JWT-аутентификация вместо сессионной — осознанный выбор под SPA-архитектуру с отдельным Vue-фронтом.</li>
+    <li>Celery + Redis для фоновых задач — долгие операции вынесены из request-response цикла.</li>
+    <li>CI через GitHub Actions — прогон тестов и линтеров при каждом пуше.</li>
+    <li>Docker — контейнеризация всего стека, воспроизводимое окружение.</li>
+    <li>Интеграция с Anthropic API — аутентификация запросов, обработка ответов и сетевых ошибок.</li>
+  </ul>
+  <p><a href="https://gitlab.com/django_pet_project1/sprint-task-tracker">Репозиторий →</a></p>
+</noscript>
 <x-dc>
 <helmet>
 <style>
