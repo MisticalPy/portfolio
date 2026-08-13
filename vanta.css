@@ -625,12 +625,36 @@ image-slot::part(frame) { touch-action: auto !important; }
 
 /* =====================================================================
    ПОЯВЛЕНИЕ ЭЛЕМЕНТОВ
-   Базовое состояние задаётся ТОЛЬКО при наличии класса на <html>, который
-   ставит скрипт. Без JS (или если GSAP не загрузился) контент виден сразу —
-   пустая страница вместо портфолио была бы худшим из возможных багов.
+
+   Скрытие делается КЛАССОМ, а не инлайновыми стилями из JS. Это принципиально:
+   инлайн переживает любую поломку и оставляет блок невидимым навсегда, а
+   класс снимается одной строкой — поэтому аварийный таймер в <head> реально
+   спасает контент, а не делает вид.
+
+   Показ включает IntersectionObserver: он смотрит на фактическое пересечение
+   и ему безразличны сдвиги вёрстки после подгрузки шрифтов и картинок.
    ===================================================================== */
 
-.v-js [data-reveal] { opacity: 0; transform: translateY(28px); }
+.v-js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.85s var(--ease), transform 0.85s var(--ease);
+}
+.v-js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Пословное появление биографии: маска обрезает слово, пока оно внизу. */
+.v-js [data-reveal-words] .flip-word {
+  opacity: 0;
+  transform: translateY(110%);
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+}
+.v-js [data-reveal-words].is-in .flip-word { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v-js [data-reveal],
+  .v-js [data-reveal-words] .flip-word,
+  .v-js .v-enter { opacity: 1 !important; transform: none !important; animation: none !important; }
+}
 
 @keyframes vRise {
   from { opacity: 0; transform: translateY(26px); }

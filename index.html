@@ -21,10 +21,14 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <script>
-  /* Прячем элементы до появления только если JS жив, и снимаем защиту через
-     3 секунды: если GSAP не доедет с CDN, страница обязана остаться видимой. */
+  /* Прячем элементы до появления только если JS жив. Таймер — страховка:
+     если разметка так и не ожила, класс снимается и контент виден целиком.
+     Компонент, поднявшись, гасит таймер, иначе анимации обрывались бы через
+     несколько секунд после загрузки. */
   document.documentElement.classList.add('v-js');
-  setTimeout(function () { document.documentElement.classList.remove('v-js'); }, 3000);
+  window.__vRescue = setTimeout(function () {
+    document.documentElement.classList.remove('v-js');
+  }, 4000);
 </script>
 <script src="./support.js"></script>
 </head>
@@ -74,8 +78,6 @@
     .project-grid { grid-template-columns: 1fr; }
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="./image-slot.js"></script>
 <script src="./vanta-particles.js"></script>
 </helmet>
@@ -144,7 +146,7 @@
       <div class="about-grid">
         <div>
           <div class="v-label v-label--accent" data-reveal="" style="margin-bottom:26px;">{{ t.specialization }}</div>
-          <p class="v-body" style="max-width:none;">
+          <p class="v-body" data-reveal-words="" style="max-width:none;">
             <sc-for list="{{ bioWords }}" as="w" hint-placeholder-count="20">
               <span class="hero-flip-mask"><span class="hero-flip-word flip-word">{{ w }}</span></span>
             </sc-for>
@@ -296,59 +298,54 @@ class Component extends DCLogic {
     window.addEventListener('scroll', this.onScroll, { passive: true });
     this.onScroll();
 
-    this.waitForGsap(() => requestAnimationFrame(() => this.runAnimations()));
+    requestAnimationFrame(() => this.setupReveals());
   }
 
   componentDidUpdate() {
     this.syncFormLabels(this.state.lang);
+    // Смена языка перерисовывает слова биографии — раздаём задержки заново.
+    this.staggerWords();
   }
 
   componentWillUnmount() {
     if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+    if (this.io) this.io.disconnect();
   }
 
-  waitForGsap(cb, attempts = 0) {
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') { cb(); return; }
-    if (attempts > 60) return;               // ~3 c, дальше страница живёт без анимаций
-    setTimeout(() => this.waitForGsap(cb, attempts + 1), 50);
-  }
-
-  runAnimations() {
-    if (!this.rootEl || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-    if (window.__gsapRegistered !== true) {
-      gsap.registerPlugin(ScrollTrigger);
-      window.__gsapRegistered = true;
-    }
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.classList.remove('v-js');
-      return;
-    }
-
-    const root = this.rootEl;
-    const stagger = (this.props.revealStagger ?? 18) / 1000;
-
-    // Пословное появление биографии
-    const words = root.querySelectorAll('.flip-word');
-    if (words.length) {
-      gsap.set(words, { yPercent: 115, opacity: 0 });
-      ScrollTrigger.create({
-        trigger: root.querySelector('.about-section'),
-        start: 'top 78%',
-        once: true,
-        onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, duration: 0.55, ease: 'power4.out', stagger })
-      });
-    }
-
-    // Блоки выезжают снизу при попадании во вьюпорт
-    root.querySelectorAll('[data-reveal]').forEach((el) => {
-      gsap.set(el, { opacity: 0, y: 28 });
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 90%',
-        once: true,
-        onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
-      });
+  // Каскад по словам задаётся задержкой перехода, а не таймлайном: так эффект
+  // живёт в CSS и не может «залипнуть» из-за проблем со сторонним скриптом.
+  staggerWords() {
+    if (!this.rootEl) return;
+    const step = this.props.revealStagger ?? 18;
+    this.rootEl.querySelectorAll('.flip-word').forEach((el, i) => {
+      el.style.transitionDelay = (i * step) + 'ms';
     });
+  }
+
+  setupReveals() {
+    if (!this.rootEl) return;
+    const targets = this.rootEl.querySelectorAll('[data-reveal], [data-reveal-words]');
+    const showAll = () => targets.forEach((el) => el.classList.add('is-in'));
+
+    this.staggerWords();
+
+    // Аварийный таймер больше не нужен: разметка ожила и сама доведёт показ.
+    if (window.__vRescue) { clearTimeout(window.__vRescue); window.__vRescue = null; }
+
+    if (!('IntersectionObserver' in window)) { showAll(); return; }
+
+    // Наблюдатель, а не пересчёт координат по скроллу: шрифты и превью
+    // проектов догружаются уже после монтирования и двигают вёрстку — от
+    // закешированных позиций нижние блоки просто не доезжали до показа.
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        this.io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 });
+
+    targets.forEach((el) => this.io.observe(el));
   }
 
   renderVals() {
