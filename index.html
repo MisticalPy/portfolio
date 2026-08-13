@@ -15,10 +15,21 @@
 <meta name="twitter:title" content="Alexey Gordeev — Python Backend Developer">
 <meta name="twitter:description" content="Портфолио Python Backend Developer: асинхронные системы, REST API, микросервисы, интеграции ИИ и Web3.">
 <meta name="twitter:image" content="https://misticalpy.xyz/assets/og-image.jpg">
+<meta name="theme-color" content="#0e0e0e">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script>
+  /* Прячем элементы до появления только если JS жив. Таймер — страховка:
+     если разметка так и не ожила, класс снимается и контент виден целиком.
+     Компонент, поднявшись, гасит таймер, иначе анимации обрывались бы через
+     несколько секунд после загрузки. */
+  document.documentElement.classList.add('v-js');
+  window.__vRescue = setTimeout(function () {
+    document.documentElement.classList.remove('v-js');
+  }, 4000);
+</script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -52,197 +63,198 @@
 </noscript>
 <x-dc>
 <helmet>
-<style>
-  @font-face { font-family: 'Anton'; src: local('Anton'); }
-  * { box-sizing: border-box; }
-  body { margin: 0; }
-
-  /* ---- ЕДИНЫЙ СКРОЛЛ СТРАНИЦЫ ----------------------------------------
-     Раньше рантайм фиксировал #dc-root и .sc-host на height:100%, а корневой
-     div имел overflow-x:hidden (по спеке это превращает overflow-y в auto).
-     В итоге каждый враппер становился собственным скролл-контейнером —
-     отсюда «у каждого блока свой скролл». Ниже высоты отпускаются, а
-     горизонтальное обрезание уходит на уровень документа. */
-  html { overflow-x: hidden; }
-  html, body { height: auto !important; min-height: 100%; }
-  #dc-root, #dc-root > .sc-host { height: auto !important; min-height: 100%; overflow: visible !important; }
-  /* Мобильный скролл пальцем по превью работ: у <image-slot> внутри
-     touch-action:none (режим редактирования), из-за чего свайп по картинке
-     не прокручивал страницу. */
-  image-slot, image-slot::part(image), image-slot::part(frame) { touch-action: auto !important; }
-  .hero-section { height: 100svh; }
-  ::selection { background: #ffffff; color: #0a0a0a; }
-  @keyframes scrollDot { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(18px); opacity: 0; } }
-  @keyframes grainShift {
-    0%,100% { transform:translate(0,0); } 10%{transform:translate(-1%,-1%);} 20%{transform:translate(1%,1%);}
-    30%{transform:translate(-1%,1%);} 40%{transform:translate(1%,-1%);} 50%{transform:translate(-1%,0);}
-    60%{transform:translate(1%,0);} 70%{transform:translate(0,1%);} 80%{transform:translate(0,-1%);} 90%{transform:translate(1%,1%);}
-  }
-  @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-25%); } }
-  @keyframes glowDriftA { 0%,100% { transform:translate(0,0) scale(1); opacity:0.9; } 50% { transform:translate(60px,40px) scale(1.15); opacity:0.6; } }
-  @keyframes glowDriftB { 0%,100% { transform:translate(0,0) scale(1); opacity:0.7; } 50% { transform:translate(-50px,-30px) scale(1.1); opacity:1; } }
-  .grain-layer { position:fixed; inset:-10%; background-image:radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size:3px 3px; opacity:0.5; animation:grainShift 1s steps(6) infinite; pointer-events:none; mix-blend-mode:overlay; z-index:1; }
-  @media (max-width: 720px) {
-    .project-grid { grid-template-columns: 1fr !important; }
-    .hero-topbar { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
-  }
-  a { color: inherit; text-decoration: none; }
-  .link-fade { color:#9a9a9a; transition:color .3s ease, text-shadow .3s ease; }
-  .link-fade:hover { color: var(--accent); text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent); }
-  .scroll-progress { position:fixed; top:0; left:0; height:3px; width:0%; background:var(--accent); z-index:9998; }
-  .lang-toggle { position:fixed; bottom:16px; right:16px; z-index:9997; display:flex; gap:2px; background:rgba(15,15,15,0.7); backdrop-filter:blur(6px); border:1px solid #262626; border-radius:999px; padding:3px; }
-  .lang-btn { border:none; background:transparent; color:#7a7a7a; font-size:11px; letter-spacing:0.06em; padding:5px 11px; border-radius:999px; cursor:pointer; font-family:inherit; transition:color .25s ease, background .25s ease; }
-  .lang-btn:hover { color:#e6e6e6; }
-  .lang-btn[data-active="true"] { background:var(--accent); color:#0a0a0a; font-weight:600; }
-  .shape-layer-scroll { position:absolute; top:0; left:0; width:100%; pointer-events:none; z-index:-1; overflow:clip; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&amp;family=IBM+Plex+Mono:wght@300;400&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./vanta.css">
+<style>
+  /* Точечные правила первого экрана — всё общее живёт в vanta.css */
+  .hero-flip-word { display: inline-block; }
+  .hero-flip-mask { display: inline-block; overflow: hidden; vertical-align: top; margin-right: 0.26em; }
+  .about-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+  .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 2.6vw, 34px); }
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .project-grid { grid-template-columns: 1fr; }
+  }
+</style>
 <script src="./image-slot.js"></script>
+<script src="./vanta-particles.js"></script>
 </helmet>
-<div ref="{{ setRootRef }}" style="background:#0a0a0a; color:#ffffff; font-family:'Space Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif; min-height:100vh; overflow-x:clip; position:relative; background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:48px 48px; --accent:{{ accentColor }}; z-index:0;">
-  <div class="grain-layer"></div>
-  <div class="scroll-progress" ref="{{ setProgressRef }}"></div>
-  <div class="lang-toggle">
-    <button class="lang-btn" data-active="{{ isRu }}" onClick="{{ setLangRu }}">RU</button>
-    <button class="lang-btn" data-active="{{ isEn }}" onClick="{{ setLangEn }}">EN</button>
+
+<div class="v-page" ref="{{ setRootRef }}">
+  <div class="v-canvas" id="v-canvas"></div>
+  <div class="v-grain"></div>
+  <div class="v-progress" ref="{{ setProgressRef }}"></div>
+
+  <div class="v-lang">
+    <button data-active="{{ isRu }}" onClick="{{ setLangRu }}">RU</button>
+    <button data-active="{{ isEn }}" onClick="{{ setLangEn }}">EN</button>
   </div>
-  <div class="shape-layer-scroll" ref="{{ setShapeLayerRef }}"></div>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero-section" style="height:100vh; display:flex; flex-direction:column; justify-content:space-between; padding:32px clamp(20px,5vw,64px); position:relative; overflow:hidden;">
-    <div style="position:absolute; top:-120px; left:-100px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}30, transparent 70%); filter:blur(50px); pointer-events:none; animation:glowDriftA 9s ease-in-out infinite;"></div>
-    <div style="position:absolute; bottom:-160px; right:-120px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}22, transparent 70%); filter:blur(60px); pointer-events:none; animation:glowDriftB 11s ease-in-out infinite;"></div>
-    <div style="position:absolute; top:40%; left:50%; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}10 0%, {{ accentColor }}06 35%, transparent 70%); filter:blur(100px); pointer-events:none; transform:translateX(-50%); animation:glowDriftA 13s ease-in-out infinite reverse;"></div>
-    <div class="hero-topbar" style="display:flex; justify-content:space-between; align-items:center; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:#9a9a9a;">
-      <span>2026-2027</span>
-      <span>{{ t.role }}</span>
-      <a href="https://t.me/MisticalPy_blog" target="_blank" rel="noopener" class="link-fade">t.me/MisticalPy_blog</a>
-    </div>
+  <div class="v-content">
 
-    <div ref="{{ setHeroContentRef }}" style="display:flex; flex-direction:column; align-items:center; gap:28px; margin:auto 0;">
-      <svg viewBox="0 0 1080 150" style="width:min(94vw,1080px); height:auto; overflow:visible;">
-        <defs>
-          <filter id="rough" x="-20%" y="-30%" width="140%" height="160%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.05" numOctaves="2" seed="7" result="noise"></feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="4"></feDisplacementMap>
-          </filter>
-        </defs>
-        <g style="filter:url(#rough);">
-          <sc-for list="{{ letters }}" as="L" hint-placeholder-count="9">
-            <path class="hero-letter" d="{{ L.d }}" transform="translate({{ L.x }},4)" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"></path>
-          </sc-for>
-        </g>
-      </svg>
-      <div style="text-align:center;">
-        <h1 style="font-size:15px; font-weight:400; letter-spacing:0.08em; text-transform:uppercase; color:#e6e6e6; margin:0;">Alexey Gordeev</h1>
-        <div style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#7a7a7a; margin-top:4px;">{{ t.role }}</div>
+    <!-- ============ ПЕРВЫЙ ЭКРАН ============ -->
+    <section class="v-hero">
+      <nav class="v-nav v-hero__nav">
+        <a href="./index.html" class="v-brand">Alexey Gordeev</a>
+        <div class="v-nav-links">
+          <a href="./Works.dc.html" class="v-nav-link"><span class="v-idx">01</span>{{ t.navWork }}</a>
+          <a href="#stack" class="v-nav-link"><span class="v-idx">02</span>{{ t.navStack }}</a>
+          <a href="#contact" class="v-nav-link"><span class="v-idx">03</span>{{ t.navContact }}</a>
+        </div>
+      </nav>
+
+      <div class="v-hero__main">
+        <div class="v-tag v-enter v-d1">{{ t.role }}</div>
+        <h1 class="v-h1 v-enter v-d2">
+          <span class="v-thin">{{ t.heroThin }}</span>Python Backend<br><em>{{ t.heroAccent }}</em>
+        </h1>
+        <p class="v-lead v-enter v-d3">{{ t.heroLead }}</p>
+        <div class="v-hero__actions v-enter v-d4">
+          <a href="./Works.dc.html" class="v-btn">{{ t.allWork }} <span class="v-btn__arrow">&rarr;</span></a>
+          <a href="https://t.me/Work_misticalPy" target="_blank" rel="noopener" class="v-btn v-btn--ghost">{{ t.writeMe }}</a>
+        </div>
       </div>
-    </div>
 
-    <div style="overflow:hidden; border-top:1px solid #1e1e1e; border-bottom:1px solid #1e1e1e; padding:14px 0;">
-      <div style="display:flex; width:max-content; animation:marqueeScroll 48s linear infinite; gap:0; will-change:transform;">
-        <sc-for list="{{ marqueeItems }}" as="m" hint-placeholder-count="16">
-          <span style="font-size:13px; letter-spacing:0.12em; text-transform:uppercase; color:#7a7a7a; padding:0 22px; white-space:nowrap;">{{ m }} <span style="color:{{ accentColor }};">•</span></span>
+      <aside class="v-hero__aside">
+        <div class="v-morph">
+          <div class="v-label v-enter v-enter--fade v-d5">{{ t.activeForm }}</div>
+          <div class="v-morph__name v-enter v-enter--fade v-d5" id="v-morph-name">{{ t.formAsync }}</div>
+          <div class="v-morph__counter v-enter v-enter--fade v-d6" id="v-morph-counter">01 / 04</div>
+          <div class="v-morph__bar v-enter v-enter--fade v-d6"><div class="v-morph__fill" id="v-morph-progress"></div></div>
+        </div>
+      </aside>
+
+      <div class="v-hero__foot">
+        <div class="v-hero__sig v-enter v-enter--fade v-d6">
+          {{ t.footerTagline }}<br>&copy; 2026 Alexey Gordeev
+        </div>
+        <div class="v-dots v-enter v-enter--fade v-d6">
+          <button class="v-dot" data-vdot="0" data-active="true" aria-label="Async"></button>
+          <button class="v-dot" data-vdot="1" data-active="false" aria-label="Container"></button>
+          <button class="v-dot" data-vdot="2" data-active="false" aria-label="Queue"></button>
+          <button class="v-dot" data-vdot="3" data-active="false" aria-label="Stream"></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="v-rule"></div>
+
+    <!-- ============ О СЕБЕ + СТЕК ============ -->
+    <section class="v-section about-section" id="stack">
+      <div class="about-grid">
+        <div>
+          <div class="v-label v-label--accent" data-reveal="" style="margin-bottom:26px;">{{ t.specialization }}</div>
+          <p class="v-body" data-reveal-words="" style="max-width:none;">
+            <sc-for list="{{ bioWords }}" as="w" hint-placeholder-count="20">
+              <span class="hero-flip-mask"><span class="hero-flip-word flip-word">{{ w }}</span></span>
+            </sc-for>
+          </p>
+        </div>
+        <div data-reveal="">
+          <div class="v-label" style="margin-bottom:22px;">{{ t.stackLabel }}</div>
+          <div class="v-chips">
+            <sc-for list="{{ stack }}" as="s" hint-placeholder-count="13">
+              <span class="v-chip">{{ s }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="v-rule"></div>
+
+    <!-- ============ ПРОЕКТЫ ============ -->
+    <section class="v-section" id="work">
+      <div class="v-section__head" data-reveal="">
+        <h2 class="v-h2">{{ t.selectedWorkA }} <em>{{ t.selectedWorkB }}</em></h2>
+        <a href="./Works.dc.html" class="v-link">{{ t.allWork }} &rarr;</a>
+      </div>
+      <div class="project-grid">
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="2">
+          <article class="v-card" data-reveal="">
+            <a href="{{ p.detailUrl }}" class="v-card__media">
+              <image-slot id="{{ p.id }}" shape="rect" fit="contain" placeholder="Drop project preview" src="{{ p.img }}"></image-slot>
+            </a>
+            <a href="{{ p.detailUrl }}" class="v-card__head">
+              <span class="v-card__title">{{ p.title }}</span>
+              <span class="v-card__year">{{ p.year }}</span>
+            </a>
+            <div class="v-card__stack">{{ p.stack }}</div>
+            <a href="{{ p.url }}" target="_blank" rel="noopener" class="v-link v-link--accent">{{ t.viewRepo }}</a>
+          </article>
         </sc-for>
       </div>
-    </div>
+    </section>
 
-  </section>
+    <!-- ============ КОНТАКТЫ ============ -->
+    <footer class="v-footer" id="contact">
+      <div style="text-align:center;" data-reveal="">
+        <div class="v-label" style="margin-bottom:18px;">{{ t.workInquiries }}</div>
+        <a href="https://t.me/Work_misticalPy" target="_blank" rel="noopener" class="v-footer__mail">@Work_misticalPy</a>
+      </div>
+      <div class="v-footer__social" data-reveal="">
+        <a href="https://github.com/MisticalPy" target="_blank" rel="noopener" class="v-link">GitHub</a>
+        <a href="https://gitlab.com/MisticalPy" target="_blank" rel="noopener" class="v-link">GitLab</a>
+        <a href="https://t.me/MisticalPy_blog" target="_blank" rel="noopener" class="v-link">Telegram</a>
+        <a href="https://youtube.com/@MisticalPy" target="_blank" rel="noopener" class="v-link">YouTube</a>
+      </div>
+      <div class="v-footer__meta">
+        <span>&copy; 2026 Alexey Gordeev</span>
+        <span>{{ t.footerTagline }}</span>
+      </div>
+    </footer>
 
-  <!-- ============ ABOUT ============ -->
-  <section class="about-section" style="max-width:880px; margin:0 auto; padding:clamp(80px,14vh,160px) clamp(20px,5vw,64px);">
-    <div data-reveal="" style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:{{ accentColor }}; margin-bottom:28px;">{{ t.specialization }}</div>
-    <p style="font-size:clamp(24px,3.4vw,40px); line-height:1.5; font-weight:500; margin:0;">
-      <sc-for list="{{ bioWords }}" as="w" hint-placeholder-count="20">
-        <span style="display:inline-block; overflow:hidden; vertical-align:top; margin-right:0.28em;"><span class="flip-word" style="display:inline-block;">{{ w }}</span></span>
-      </sc-for>
-    </p>
-    <div data-reveal="" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:40px;">
-      <sc-for list="{{ stack }}" as="s" hint-placeholder-count="8">
-        <span style="font-size:12px; letter-spacing:0.04em; text-transform:uppercase; color:#c9c9c9; border:1px solid #2a2a2a; border-radius:999px; padding:7px 14px; background:rgba(255,255,255,0); backdrop-filter:blur(0px); transition:color .3s ease, border-color .3s ease, background .3s ease, backdrop-filter .3s ease, box-shadow .3s ease;" style-hover="color:{{ accentColor }}; border-color:{{ accentColor }}; background:rgba(255,255,255,0.06); backdrop-filter:blur(6px); box-shadow:0 0 20px {{ accentColor }}33, inset 0 1px 0 rgba(255,255,255,0.12);">{{ s }}</span>
-      </sc-for>
-    </div>
-  </section>
-
-  <!-- ============ PROJECTS ============ -->
-  <section style="padding:0 clamp(20px,5vw,64px) clamp(80px,12vh,140px);">
-    <div data-reveal="" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:32px;">
-      <span style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#7a7a7a;">{{ t.selectedWork }}</span>
-      <a href="./Works.dc.html" class="link-fade" style="font-size:12px; letter-spacing:0.08em; text-transform:uppercase;">{{ t.allWork }}</a>
-    </div>
-    <div class="project-grid" style="display:grid; grid-template-columns:repeat({{ gridColumnsNum }}, 1fr); gap:clamp(24px,3vw,40px);">
-      <sc-for list="{{ projects }}" as="p" hint-placeholder-count="6">
-        <div class="project-card" data-reveal="" style="display:flex; flex-direction:column; gap:16px; padding:18px; border:1px solid #1e1e1e; background:#0f0f0f; transition:border-color .35s ease, transform .35s ease, box-shadow .35s ease;" style-hover="border-color:{{ accentColor }}; transform:translateY(-4px); box-shadow:0 20px 50px -28px rgba(0,0,0,0.8);">
-          <a href="{{ p.detailUrl }}" style="width:100%; aspect-ratio:16/9; overflow:hidden; border:1px solid #262626; display:block;">
-            <image-slot id="{{ p.id }}" shape="rect" fit="contain" placeholder="Drop project preview" src="{{ p.img }}" style="width:100%; height:100%; display:block; transform:scale(1); transition:transform .6s ease;" style-hover="transform:scale(1.08);"></image-slot>
-          </a>
-          <a href="{{ p.detailUrl }}" style="display:flex; justify-content:space-between; align-items:baseline; font-size:16px; font-weight:600; color:#ffffff;">
-            <span>{{ p.title }}</span>
-            <span style="color:#7a7a7a; font-size:13px; font-weight:400;">{{ p.year }}</span>
-          </a>
-          <div style="font-size:12px; color:#7a7a7a; letter-spacing:0.02em;">{{ p.stack }}</div>
-          <a href="{{ p.url }}" target="_blank" rel="noopener" style="font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:{{ accentColor }};">{{ t.viewRepo }}</a>
-        </div>
-      </sc-for>
-    </div>
-  </section>
-
-  <!-- ============ CONTACT ============ -->
-  <footer style="border-top:1px solid #232323; padding:clamp(60px,10vh,110px) clamp(20px,5vw,64px) 40px; display:flex; flex-direction:column; gap:56px;">
-    <div data-reveal="" style="text-align:center;">
-      <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#7a7a7a; margin-bottom:20px;">{{ t.workInquiries }}</div>
-      <a href="https://t.me/Work_misticalPy" target="_blank" rel="noopener" class="link-fade" style="font-size:clamp(28px,5vw,56px); font-weight:600; color:#ffffff;">@Work_misticalPy</a>
-    </div>
-    <div style="display:flex; justify-content:center; gap:36px; flex-wrap:wrap; font-size:13px; letter-spacing:0.06em; text-transform:uppercase;">
-      <a href="https://github.com/MisticalPy" target="_blank" rel="noopener" class="link-fade">GitHub</a>
-      <a href="https://gitlab.com/MisticalPy" target="_blank" rel="noopener" class="link-fade">GitLab</a>
-      <a href="https://t.me/MisticalPy_blog" target="_blank" rel="noopener" class="link-fade">Telegram</a>
-      <a href="https://youtube.com/@MisticalPy" target="_blank" rel="noopener" class="link-fade">YouTube</a>
-    </div>
-    <div style="display:flex; justify-content:space-between; font-size:11px; color:#4d4d4d; letter-spacing:0.04em;">
-      <span>© 2026 Alexey Gordeev</span>
-      <span>{{ t.footerTagline }}</span>
-    </div>
-  </footer>
+  </div>
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#D4FF3F&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#D4FF3F&quot;,&quot;#7FFFD4&quot;,&quot;#FF5C38&quot;,&quot;#9B9B9B&quot;]},&quot;revealStagger&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:20,&quot;min&quot;:20,&quot;max&quot;:100,&quot;step&quot;:5,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;gridColumns&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;2&quot;,&quot;options&quot;:[&quot;2&quot;,&quot;3&quot;,&quot;4&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
-const LETTERS = [
-  { ch:'P', d:'M15,132 L15,8 L62,8 C90,8 90,62 62,62 L15,62', x:0 },
-  { ch:'O', d:'M50,8 C18,8 12,72 12,72 C12,72 18,132 50,132 C82,132 88,72 88,72 C88,72 82,8 50,8 Z', x:120 },
-  { ch:'R', d:'M15,132 L15,8 L60,8 C88,8 88,55 60,55 L15,55 M42,55 L82,132', x:240 },
-  { ch:'T', d:'M8,8 L92,8 M50,8 L50,132', x:360 },
-  { ch:'F', d:'M18,132 L18,8 L85,8 M18,68 L68,68', x:480 },
-  { ch:'O', d:'M50,8 C18,8 12,72 12,72 C12,72 18,132 50,132 C82,132 88,72 88,72 C88,72 82,8 50,8 Z', x:600 },
-  { ch:'L', d:'M20,8 L20,132 L82,132', x:720 },
-  { ch:'I', d:'M50,8 L50,132', x:840 },
-  { ch:'O', d:'M50,8 C18,8 12,72 12,72 C12,72 18,132 50,132 C82,132 88,72 88,72 C88,72 82,8 50,8 Z', x:960 }
-];
-
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;revealStagger&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:18,&quot;min&quot;:10,&quot;max&quot;:80,&quot;step&quot;:2,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
 const TRANSLATIONS = {
   ru: {
     role: 'Python Backend разработчик',
+    heroThin: 'Alexey Gordeev',
+    heroAccent: 'Разработчик',
+    heroLead: 'Проектирую высокопроизводительные асинхронные системы: чистые REST API, микросервисы, парсеры данных и автоматизацию процессов.',
+    navWork: 'Работы',
+    navStack: 'Стек',
+    navContact: 'Контакты',
     specialization: 'Специализация',
+    stackLabel: 'Стек',
     bio: 'Python Backend Developer с глубоким пониманием внутренней архитектуры языка и фокусом на создание высокопроизводительных асинхронных систем. Специализируюсь на проектировании чистых REST API, микросервисов, парсеров данных и автоматизации процессов, включая интеграцию ИИ и Web3-инфраструктуры. Пишу типизированный, поддерживаемый код с использованием ООП-паттернов и строгого контроля данных через Pydantic.',
-    selectedWork: 'Избранные работы',
-    allWork: 'Все работы →',
+    selectedWorkA: 'Избранные',
+    selectedWorkB: 'работы',
+    allWork: 'Все работы',
+    writeMe: 'Написать',
     viewRepo: 'Репозиторий →',
     workInquiries: 'По вопросам работы',
-    footerTagline: 'Python Backend разработка'
+    footerTagline: 'Python Backend разработка',
+    activeForm: 'Активная форма',
+    forms: ['Асинхронность', 'Контейнер', 'Очередь', 'Поток'],
+    formAsync: 'Асинхронность'
   },
   en: {
     role: 'Python Backend Developer',
+    heroThin: 'Alexey Gordeev',
+    heroAccent: 'Developer',
+    heroLead: 'I design high-performance asynchronous systems: clean REST APIs, microservices, data parsers and process automation.',
+    navWork: 'Work',
+    navStack: 'Stack',
+    navContact: 'Contact',
     specialization: 'Specialization',
+    stackLabel: 'Stack',
     bio: 'Python Backend Developer with a deep understanding of the language internals and a focus on building high-performance asynchronous systems. I specialize in designing clean REST APIs, microservices, data parsers, and process automation, including AI and Web3 integrations. I write typed, maintainable code using OOP patterns and strict data validation with Pydantic.',
-    selectedWork: 'Selected Work',
-    allWork: 'All work →',
+    selectedWorkA: 'Selected',
+    selectedWorkB: 'work',
+    allWork: 'All work',
+    writeMe: 'Get in touch',
     viewRepo: 'View repository →',
     workInquiries: 'Work inquiries',
-    footerTagline: 'Python Backend Development'
+    footerTagline: 'Python Backend Development',
+    activeForm: 'Active form',
+    forms: ['Async', 'Container', 'Queue', 'Stream'],
+    formAsync: 'Async'
   }
 };
 
@@ -253,299 +265,103 @@ const PROJECTS = [
   { id:'proj-2', title:'KohiAnime', year:'2026', stack:'Python · Async · PostgreSQL/MongoDB · Playwright · Redis', img:'./assets/kohianime.png', url:'https://gitlab.com/django_pet_project1/KohiAnime', detailUrl:'./Project-KohiAnime.dc.html' }
 ];
 
-const MARQUEE = ['PYTHON', 'ASYNCIO', 'DJANGO REST', 'MICROSERVICES', 'POSTGRESQL', 'DOCKER', 'WEB3', 'REDIS'];
-
 class Component extends DCLogic {
   state = { lang: (typeof localStorage !== 'undefined' && localStorage.getItem('portfolio-lang')) || 'ru' };
+
   setRootRef = (node) => { this.rootEl = node; };
+  setProgressRef = (node) => { this.progressEl = node; };
+
   setLang = (lang) => {
     this.setState({ lang });
     if (typeof localStorage !== 'undefined') localStorage.setItem('portfolio-lang', lang);
   };
-  setProgressRef = (node) => { this.progressEl = node; };
-  setHeroContentRef = (node) => { this.heroContentEl = node; };
-  setShapeLayerRef = (node) => { this.shapeLayerEl = node; };
+
+  // Подписи фигур живут здесь, а не в vanta-particles.js: язык знает
+  // компонент. Скрипт частиц просто читает глобальную переменную на каждой
+  // смене формы — так нет ни ререндеров на кадр, ни гонки при загрузке.
+  syncFormLabels(lang) {
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
+    window.VANTA_LABELS = t.forms;
+    const nameEl = document.getElementById('v-morph-name');
+    const idx = Number(document.documentElement.getAttribute('data-vanta-shape') || 0);
+    if (nameEl && t.forms[idx]) nameEl.textContent = t.forms[idx];
+  }
 
   componentDidMount() {
-    this.waitForGsap(() => {
-      requestAnimationFrame(() => requestAnimationFrame(() => this.runAnimations()));
-      setTimeout(() => this.ensureHeroDrawn(), 4800);
-    });
-    this.waitForShapeLayer(() => this.setupScrollShapes());
-  }
+    this.syncFormLabels(this.state.lang);
 
-  onHeroDrawComplete() {
-    if (this._heroDrawDone) return;
-    this._heroDrawDone = true;
-    if (this._spawnShape) {
-      this._spawnShape();
-      setTimeout(() => this._spawnShape(), 700);
-      setTimeout(() => this._spawnShape(), 1400);
-    }
-  }
-
-  waitForShapeLayer(cb, attempts = 0) {
-    if (this.shapeLayerEl && this.rootEl) { cb(); return; }
-    if (attempts > 100) return;
-    requestAnimationFrame(() => this.waitForShapeLayer(cb, attempts + 1));
-  }
-
-  componentWillUnmount() {
-    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
-    if (this._onResize) window.removeEventListener('resize', this._onResize);
-  }
-
-  // Shapes are drawn at the document position where they spawn (not viewport-fixed), so
-  // scrolling back up reveals earlier ones; each fades out on its own timer regardless of scroll.
-  setupScrollShapes() {
-    if (!this.shapeLayerEl || !this.rootEl) return;
-    const layer = this.shapeLayerEl;
-    const root = this.rootEl;
-    const accent = this.props.accentColor ?? '#D4FF3F';
-    this._shapes = [];
-    const MAX_SHAPES = 4;
-    const SPAWN_GAP = 420;
-    let lastSpawnY = window.scrollY;
-
-    const updateHeight = () => {
-      layer.style.height = '0px';
-      const h = root.scrollHeight;
-      layer.style.height = h + 'px';
+    this.onScroll = () => {
+      if (!this.progressEl) return;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      this.progressEl.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
     };
-    updateHeight();
-    this._onResize = updateHeight;
-    this.updateShapeLayerHeight = updateHeight;
-    window.addEventListener('resize', this._onResize);
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onScroll();
 
-    const SVG_NS = 'http://www.w3.org/2000/svg';
-
-    // Draws a shape as an SVG stroke (circle/square/triangle) that reveals via
-    // dashoffset, like the hero title. On removal it "undraws" back to hidden,
-    // then a fresh shape spawns in to take its place, keeping the ambiance alive.
-    const GRAY = '#8a8a8a';
-
-    const spawnShape = () => {
-      const kinds = ['circle', 'square', 'diamond', 'dot'];
-      const kind = kinds[Math.floor(Math.random() * kinds.length)];
-      const color = GRAY;
-      const wrap = document.createElement('div');
-      wrap.style.position = 'absolute';
-      wrap.style.left = (Math.random() * 86 + 4) + '%';
-      wrap.style.top = (window.scrollY + window.innerHeight * (0.12 + Math.random() * 0.7)) + 'px';
-      wrap.style.opacity = '0';
-
-      let removeFn;
-      if (kind === 'dot') {
-        const size = 5 + Math.random() * 3;
-        wrap.style.width = size + 'px';
-        wrap.style.height = size + 'px';
-        wrap.style.borderRadius = '50%';
-        wrap.style.background = color;
-        wrap.style.opacity = '0';
-        layer.appendChild(wrap);
-        this._shapes.push(wrap);
-        removeFn = () => { wrap.remove(); this._shapes = this._shapes.filter((s) => s !== wrap); spawnShape(); };
-        if (typeof gsap !== 'undefined') {
-          gsap.to(wrap, { opacity: 0.35, duration: 1.4, ease: 'power2.out' });
-          const lifetime = 16 + Math.random() * 10;
-          gsap.to(wrap, { opacity: 0, duration: 2.2, delay: lifetime, ease: 'power1.inOut', onComplete: removeFn });
-        } else {
-          wrap.style.transition = 'opacity 1.4s ease';
-          wrap.style.opacity = '0.35';
-          setTimeout(() => { wrap.style.opacity = '0'; setTimeout(removeFn, 1400); }, 18000);
-        }
-      } else {
-        const size = 46 + Math.random() * 100;
-        wrap.style.width = size + 'px';
-        wrap.style.height = size + 'px';
-        const svg = document.createElementNS(SVG_NS, 'svg');
-        svg.setAttribute('viewBox', '0 0 100 100');
-        svg.setAttribute('width', '100%');
-        svg.setAttribute('height', '100%');
-        let shapeEl;
-        if (kind === 'circle') {
-          shapeEl = document.createElementNS(SVG_NS, 'circle');
-          shapeEl.setAttribute('cx', '50'); shapeEl.setAttribute('cy', '50'); shapeEl.setAttribute('r', '46');
-        } else if (kind === 'square') {
-          shapeEl = document.createElementNS(SVG_NS, 'rect');
-          shapeEl.setAttribute('x', '5'); shapeEl.setAttribute('y', '5'); shapeEl.setAttribute('width', '90'); shapeEl.setAttribute('height', '90');
-        } else {
-          shapeEl = document.createElementNS(SVG_NS, 'polygon');
-          shapeEl.setAttribute('points', '50,4 96,50 50,96 4,50');
-        }
-        shapeEl.setAttribute('fill', 'none');
-        shapeEl.setAttribute('stroke', color);
-        shapeEl.setAttribute('stroke-width', '1.2');
-        shapeEl.setAttribute('stroke-opacity', '0.3');
-        svg.appendChild(shapeEl);
-        wrap.appendChild(svg);
-        layer.appendChild(wrap);
-        this._shapes.push(wrap);
-
-        removeFn = () => { wrap.remove(); this._shapes = this._shapes.filter((s) => s !== wrap); spawnShape(); };
-        const len = shapeEl.getTotalLength();
-        shapeEl.style.strokeDasharray = len;
-        shapeEl.style.strokeDashoffset = len;
-
-        if (typeof gsap !== 'undefined') {
-          gsap.to(wrap, { opacity: 1, duration: 0.4, ease: 'power1.out' });
-          gsap.to(shapeEl, { strokeDashoffset: 0, duration: 2 + Math.random() * 0.7, ease: 'power2.inOut' });
-          const lifetime = 16 + Math.random() * 10;
-          gsap.to(shapeEl, { strokeDashoffset: -len, duration: 2 + Math.random() * 0.7, delay: lifetime, ease: 'power2.inOut', onComplete: () => {
-            gsap.to(wrap, { opacity: 0, duration: 0.4, onComplete: removeFn });
-          }});
-        } else {
-          wrap.style.opacity = '1';
-          shapeEl.style.transition = 'stroke-dashoffset 2s ease';
-          requestAnimationFrame(() => { shapeEl.style.strokeDashoffset = '0'; });
-          setTimeout(() => {
-            shapeEl.style.strokeDashoffset = String(-len);
-            setTimeout(() => { wrap.style.transition = 'opacity .4s ease'; wrap.style.opacity = '0'; setTimeout(removeFn, 400); }, 2000);
-          }, 18000);
-        }
-      }
-
-      if (this._shapes.length > MAX_SHAPES) {
-        const oldest = this._shapes.shift();
-        if (oldest) {
-          oldest.style.transition = 'opacity 1s ease';
-          oldest.style.opacity = '0';
-          setTimeout(() => oldest.remove(), 1000);
-        }
-      }
-    };
-    this._spawnShape = spawnShape;
-
-    let ticking = false;
-    this._onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        updateHeight();
-        if (!this._heroDrawDone) { ticking = false; return; }
-        const y = window.scrollY;
-        if (Math.abs(y - lastSpawnY) > SPAWN_GAP) {
-          lastSpawnY = y;
-          spawnShape();
-        }
-        ticking = false;
-      });
-    };
-    window.addEventListener('scroll', this._onScroll, { passive: true });
-  }
-
-  ensureHeroDrawn() {
-    if (!this.rootEl) return;
-    const paths = this.rootEl.querySelectorAll('.hero-letter');
-    const stuck = Array.from(paths).some((p) => {
-      const off = parseFloat(p.style.strokeDashoffset || '0');
-      const len = parseFloat(p.style.strokeDasharray || '0');
-      return len > 0 && off === len;
-    });
-    if (stuck) this.runAnimations();
-  }
-
-  waitForGsap(cb, attempts = 0) {
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') { cb(); return; }
-    if (attempts > 100) return; // ~5s, give up
-    setTimeout(() => this.waitForGsap(cb, attempts + 1), 50);
+    requestAnimationFrame(() => this.setupReveals());
   }
 
   componentDidUpdate() {
-    // language switch can change content height (word/line count), so resync the
-    // shape layer's height a moment after the new text has laid out, avoiding a phantom scrollbar.
-    if (this.updateShapeLayerHeight) {
-      requestAnimationFrame(() => requestAnimationFrame(this.updateShapeLayerHeight));
-      setTimeout(this.updateShapeLayerHeight, 60);
-      setTimeout(this.updateShapeLayerHeight, 300);
-      setTimeout(this.updateShapeLayerHeight, 700);
-    }
+    this.syncFormLabels(this.state.lang);
+    // Смена языка перерисовывает слова биографии — раздаём задержки заново.
+    this.staggerWords();
   }
 
-  runAnimations() {
-    if (!this.rootEl || typeof gsap === 'undefined') return;
-    if (window.__gsapRegistered !== true && typeof ScrollTrigger !== 'undefined') {
-      gsap.registerPlugin(ScrollTrigger);
-      window.__gsapRegistered = true;
-    }
-    const root = this.rootEl;
-    const staggerSec = (this.props.revealStagger ?? 20) / 1000;
+  componentWillUnmount() {
+    if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+    if (this.io) this.io.disconnect();
+  }
 
-    // Effect 1: hand-drawn SVG title stroke reveal, letters overlap slightly
-    const letterPaths = root.querySelectorAll('.hero-letter');
-    letterPaths.forEach((p) => {
-      const len = p.getTotalLength();
-      p.style.strokeDasharray = len;
-      p.style.strokeDashoffset = len;
+  // Каскад по словам задаётся задержкой перехода, а не таймлайном: так эффект
+  // живёт в CSS и не может «залипнуть» из-за проблем со сторонним скриптом.
+  staggerWords() {
+    if (!this.rootEl) return;
+    const step = this.props.revealStagger ?? 18;
+    this.rootEl.querySelectorAll('.flip-word').forEach((el, i) => {
+      el.style.transitionDelay = (i * step) + 'ms';
     });
-    const letterCount = letterPaths.length;
-    gsap.to(letterPaths, { strokeDashoffset: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1, onComplete: () => this.onHeroDrawComplete() });
-    // safety net in case there are no letters (layer not ready yet)
-    if (!letterCount) this.onHeroDrawComplete();
+  }
 
-    // Effect 2: word-by-word flip reveal for the about paragraph
-    const words = root.querySelectorAll('.flip-word');
-    gsap.set(words, { yPercent: 115, opacity: 0 });
-    if (typeof ScrollTrigger !== 'undefined') {
-      ScrollTrigger.create({
-        trigger: root.querySelector('.about-section'),
-        start: 'top 75%',
-        once: true,
-        onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, duration: 0.55, ease: 'power4.out', stagger: staggerSec })
+  setupReveals() {
+    if (!this.rootEl) return;
+    const targets = this.rootEl.querySelectorAll('[data-reveal], [data-reveal-words]');
+    const showAll = () => targets.forEach((el) => el.classList.add('is-in'));
+
+    this.staggerWords();
+
+    // Аварийный таймер больше не нужен: разметка ожила и сама доведёт показ.
+    if (window.__vRescue) { clearTimeout(window.__vRescue); window.__vRescue = null; }
+
+    if (!('IntersectionObserver' in window)) { showAll(); return; }
+
+    // Наблюдатель, а не пересчёт координат по скроллу: шрифты и превью
+    // проектов догружаются уже после монтирования и двигают вёрстку — от
+    // закешированных позиций нижние блоки просто не доезжали до показа.
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        this.io.unobserve(entry.target);
       });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 });
 
-      // Effect 3: scroll-triggered fade-up for sections and cards
-      const reveals = root.querySelectorAll('[data-reveal]');
-      reveals.forEach((el) => {
-        gsap.set(el, { opacity: 0, y: 36 });
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 88%',
-          once: true,
-          onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
-        });
-      });
-
-      // Effect 4: scroll progress bar + hero parallax depth
-      if (this.progressEl) {
-        gsap.to(this.progressEl, {
-          width: '100%',
-          ease: 'none',
-          scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
-        });
-      }
-      if (this.heroContentEl) {
-        gsap.to(this.heroContentEl, {
-          yPercent: 22,
-          opacity: 0.25,
-          ease: 'none',
-          scrollTrigger: { trigger: root.querySelector('section'), start: 'top top', end: 'bottom top', scrub: 0.4 }
-        });
-      }
-    }
+    targets.forEach((el) => this.io.observe(el));
   }
 
   renderVals() {
-    const cols = Number(this.props.gridColumns ?? 3);
     const lang = this.state.lang;
     const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
     return {
       setRootRef: this.setRootRef,
       setProgressRef: this.setProgressRef,
-      setHeroContentRef: this.setHeroContentRef,
-      setShapeLayerRef: this.setShapeLayerRef,
-      marqueeItems: MARQUEE.concat(MARQUEE, MARQUEE, MARQUEE),
-      letters: LETTERS,
-      t: t,
+      t,
       isRu: lang === 'ru',
       isEn: lang === 'en',
       setLangRu: () => this.setLang('ru'),
       setLangEn: () => this.setLang('en'),
       bioWords: t.bio.split(' '),
       stack: STACK,
-      projects: PROJECTS,
-      accentColor: this.props.accentColor ?? '#D4FF3F',
-      gridColumnsNum: cols
+      projects: PROJECTS
     };
   }
 }
