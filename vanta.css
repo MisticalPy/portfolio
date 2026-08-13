@@ -89,11 +89,17 @@ image-slot::part(frame) { touch-action: auto !important; }
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Живой слой частиц: fixed на весь экран, СТРОГО без событий указателя —
+/* Живой слой частиц. Приколот к ВЕРХУ документа, а не к вьюпорту: облако
+   принадлежит первому экрану и уезжает вместе с ним, вместо того чтобы
+   таскаться за скроллом по всем секциям. Событий указателя не принимает —
    иначе холст перехватывал бы касания и убивал скролл на телефоне. */
 .v-canvas {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
   z-index: 0;
   pointer-events: none;
   opacity: 0;

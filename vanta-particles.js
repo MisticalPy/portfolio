@@ -335,14 +335,24 @@
     var points = new THREE.Points(geometry, material);
     scene.add(points);
 
+    // Габариты берём у контейнера, а не у окна: холст высотой ровно в первый
+    // экран (100svh), что на мобильных не совпадает с innerHeight.
     // Смещаем облако вправо: слева на широком экране стоит текст.
+    var boxW = window.innerWidth, boxH = window.innerHeight;
+    var heroEl = document.querySelector('.v-hero');
     function layout() {
-      var wide = window.innerWidth > 900;
+      // 100svh в CSS покрывает обычный случай, но если первый экран вырос
+      // (узкий экран, перенос навигации) — подгоняем холст под него точно,
+      // чтобы облако не обрывалось на середине секции.
+      if (heroEl && heroEl.offsetHeight) container.style.height = heroEl.offsetHeight + 'px';
+      boxW = container.clientWidth || window.innerWidth;
+      boxH = container.clientHeight || window.innerHeight;
+      var wide = boxW > 900;
       points.position.x = wide ? 0.62 : 0;
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = boxW / boxH;
       camera.position.z = wide ? 5 : 6.2;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(boxW, boxH);
       material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
     }
     layout();
@@ -358,14 +368,18 @@
     var invMatrix = new THREE.Matrix4();
     var localMouse = new THREE.Vector3();
 
+    // Храним сырые экранные координаты, а в NDC переводим уже в кадре: холст
+    // приколот к началу документа, поэтому его верх на экране равен -scrollY,
+    // и без этой поправки курсор промахивался бы мимо облака при прокрутке.
+    var pointerX = -99999, pointerY = -99999;
+
     document.addEventListener('mousemove', function (e) {
-      mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      pointerX = e.clientX;
+      pointerY = e.clientY;
       mouseOn = true;
     }, { passive: true });
 
     document.addEventListener('mouseleave', function () {
-      mouseNDC.set(999, 999);
       mouseOn = false;
     });
 
@@ -395,7 +409,7 @@
 
     updateShapeUI(0, shapes.length);
 
-    // --- скролл: облако уходит в фон, но не исчезает совсем ---
+    // --- скролл: облако уезжает вверх вместе с первым экраном ---
     var scrollY = window.scrollY || 0;
     window.addEventListener('scroll', function () { scrollY = window.scrollY || 0; }, { passive: true });
 
@@ -404,7 +418,6 @@
     }
 
     var progressEl = document.getElementById('v-morph-progress');
-    var lastOpacity = -1;
 
     container.setAttribute('data-ready', '');
 
@@ -412,15 +425,10 @@
       requestAnimationFrame(frame);
       if (document.hidden) return;
 
-      var vh = window.innerHeight || 1;
-      var fade = Math.min(scrollY / (vh * 0.85), 1);
-      var opacity = 1 - fade * 0.86;
-      if (Math.abs(opacity - lastOpacity) > 0.004) {
-        container.style.opacity = String(opacity);
-        lastOpacity = opacity;
-      }
-      // Ушли далеко вниз — облако всё равно почти невидимо, незачем греть GPU.
-      if (scrollY > vh * 2.2) return;
+      // Первый экран полностью уехал вверх — облака на экране нет, незачем
+      // греть GPU. Морфинг при этом «замирает», а не убегает вперёд: при
+      // возврате наверх сцена продолжится с того же места.
+      if (scrollY > boxH) return;
 
       var t = clock.getElapsedTime();
       material.uniforms.uTime.value = t;
@@ -429,6 +437,8 @@
       material.uniforms.uMouseActive.value = mouseSmooth;
 
       if (mouseSmooth > 0.001) {
+        mouseNDC.x = (pointerX / boxW) * 2 - 1;
+        mouseNDC.y = -(((pointerY + scrollY) / boxH) * 2 - 1);
         raycaster.setFromCamera(mouseNDC, camera);
         raycaster.ray.intersectPlane(plane, hit);
         invMatrix.copy(points.matrixWorld).invert();
