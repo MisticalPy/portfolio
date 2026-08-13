@@ -56,6 +56,21 @@
   @font-face { font-family: 'Anton'; src: local('Anton'); }
   * { box-sizing: border-box; }
   body { margin: 0; }
+
+  /* ---- ЕДИНЫЙ СКРОЛЛ СТРАНИЦЫ ----------------------------------------
+     Раньше рантайм фиксировал #dc-root и .sc-host на height:100%, а корневой
+     div имел overflow-x:hidden (по спеке это превращает overflow-y в auto).
+     В итоге каждый враппер становился собственным скролл-контейнером —
+     отсюда «у каждого блока свой скролл». Ниже высоты отпускаются, а
+     горизонтальное обрезание уходит на уровень документа. */
+  html { overflow-x: hidden; }
+  html, body { height: auto !important; min-height: 100%; }
+  #dc-root, #dc-root > .sc-host { height: auto !important; min-height: 100%; overflow: visible !important; }
+  /* Мобильный скролл пальцем по превью работ: у <image-slot> внутри
+     touch-action:none (режим редактирования), из-за чего свайп по картинке
+     не прокручивал страницу. */
+  image-slot, image-slot::part(image), image-slot::part(frame) { touch-action: auto !important; }
+  .hero-section { height: 100svh; }
   ::selection { background: #ffffff; color: #0a0a0a; }
   @keyframes scrollDot { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(18px); opacity: 0; } }
   @keyframes grainShift {
@@ -79,7 +94,7 @@
   .lang-btn { border:none; background:transparent; color:#7a7a7a; font-size:11px; letter-spacing:0.06em; padding:5px 11px; border-radius:999px; cursor:pointer; font-family:inherit; transition:color .25s ease, background .25s ease; }
   .lang-btn:hover { color:#e6e6e6; }
   .lang-btn[data-active="true"] { background:var(--accent); color:#0a0a0a; font-weight:600; }
-  .shape-layer-scroll { position:absolute; top:0; left:0; width:100%; pointer-events:none; z-index:-1; overflow:visible; }
+  .shape-layer-scroll { position:absolute; top:0; left:0; width:100%; pointer-events:none; z-index:-1; overflow:clip; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -87,7 +102,7 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="./image-slot.js"></script>
 </helmet>
-<div ref="{{ setRootRef }}" style="background:#0a0a0a; color:#ffffff; font-family:'Space Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif; min-height:100vh; overflow-x:hidden; position:relative; background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:48px 48px; --accent:{{ accentColor }}; z-index:0;">
+<div ref="{{ setRootRef }}" style="background:#0a0a0a; color:#ffffff; font-family:'Space Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif; min-height:100vh; overflow-x:clip; position:relative; background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:48px 48px; --accent:{{ accentColor }}; z-index:0;">
   <div class="grain-layer"></div>
   <div class="scroll-progress" ref="{{ setProgressRef }}"></div>
   <div class="lang-toggle">
@@ -97,7 +112,7 @@
   <div class="shape-layer-scroll" ref="{{ setShapeLayerRef }}"></div>
 
   <!-- ============ HERO ============ -->
-  <section style="height:100vh; display:flex; flex-direction:column; justify-content:space-between; padding:32px clamp(20px,5vw,64px); position:relative; overflow:hidden;">
+  <section class="hero-section" style="height:100vh; display:flex; flex-direction:column; justify-content:space-between; padding:32px clamp(20px,5vw,64px); position:relative; overflow:hidden;">
     <div style="position:absolute; top:-120px; left:-100px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}30, transparent 70%); filter:blur(50px); pointer-events:none; animation:glowDriftA 9s ease-in-out infinite;"></div>
     <div style="position:absolute; bottom:-160px; right:-120px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}22, transparent 70%); filter:blur(60px); pointer-events:none; animation:glowDriftB 11s ease-in-out infinite;"></div>
     <div style="position:absolute; top:40%; left:50%; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, {{ accentColor }}10 0%, {{ accentColor }}06 35%, transparent 70%); filter:blur(100px); pointer-events:none; transform:translateX(-50%); animation:glowDriftA 13s ease-in-out infinite reverse;"></div>
