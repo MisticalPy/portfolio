@@ -135,9 +135,11 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const PROJECTS = [
+// Захардкоженный запасной набор — если ./projects.json недоступен
+// (сеть/404), карточки всё равно не пропадают со страницы.
+const PROJECTS_FALLBACK = [
   {
-    id: 'work-1',
+    id: 'proj-1',
     title: 'Sprint Task Tracker',
     year: '2026',
     img: './assets/sprint-task-tracker.png',
@@ -148,7 +150,7 @@ const PROJECTS = [
     tags: ['Django', 'DRF', 'Vue 3', 'Celery', 'Redis', 'Docker', 'JWT']
   },
   {
-    id: 'work-2',
+    id: 'proj-2',
     title: 'KohiAnime',
     year: '2026',
     img: './assets/kohianime.png',
@@ -184,7 +186,10 @@ const TRANSLATIONS = {
 };
 
 class Component extends DCLogic {
-  state = { lang: (typeof localStorage !== 'undefined' && localStorage.getItem('portfolio-lang')) || 'ru' };
+  state = {
+    lang: (typeof localStorage !== 'undefined' && localStorage.getItem('portfolio-lang')) || 'ru',
+    projects: PROJECTS_FALLBACK
+  };
 
   setRootRef = (node) => { this.rootEl = node; };
   setProgressRef = (node) => { this.progressEl = node; };
@@ -203,6 +208,21 @@ class Component extends DCLogic {
     window.addEventListener('scroll', this.onScroll, { passive: true });
     this.onScroll();
     requestAnimationFrame(() => this.setupReveals());
+
+    // Список проектов редактируется отдельно от кода — прямо в projects.json
+    // на GitHub. Фолбэк-массив выше остаётся на случай, если файл недоступен
+    // (сеть, 404), чтобы карточки не пропадали со страницы.
+    fetch('./projects.json')
+      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then((projects) => { if (Array.isArray(projects) && projects.length) this.setState({ projects }); })
+      .catch(() => {});
+  }
+
+  componentDidUpdate() {
+    // Карточки проектов подгружаются асинхронно и рендерятся уже после
+    // первого прохода setupReveals — без повторного наблюдения они бы
+    // остались с opacity:0 навсегда.
+    requestAnimationFrame(() => this.observeNewReveals());
   }
 
   componentWillUnmount() {
@@ -236,6 +256,14 @@ class Component extends DCLogic {
     targets.forEach((el) => this.io.observe(el));
   }
 
+  // Догоняет reveal-наблюдение после того, как DOM обновился (например,
+  // подгрузились карточки проектов) — safe re-observe, IntersectionObserver
+  // не даёт дублей на уже отслеживаемых элементах.
+  observeNewReveals() {
+    if (!this.rootEl || !this.io) return;
+    this.rootEl.querySelectorAll('[data-reveal]:not(.is-in)').forEach((el) => this.io.observe(el));
+  }
+
   renderVals() {
     const lang = this.state.lang;
     const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
@@ -247,7 +275,7 @@ class Component extends DCLogic {
       isEn: lang === 'en',
       setLangRu: () => this.setLang('ru'),
       setLangEn: () => this.setLang('en'),
-      projects: PROJECTS.map((p) => ({ ...p, desc: lang === 'en' ? p.descriptionEn : p.descriptionRu }))
+      projects: this.state.projects.map((p) => ({ ...p, desc: lang === 'en' ? p.descriptionEn : p.descriptionRu }))
     };
   }
 }
