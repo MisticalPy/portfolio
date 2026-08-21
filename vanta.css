@@ -725,11 +725,38 @@ image-slot::part(frame) { touch-action: auto !important; }
    ===================================================================== */
 
 @media (max-width: 900px) {
-  .v-hero { grid-template-columns: 1fr; }
-  .v-hero__main { grid-column: 1; max-width: none; padding-top: clamp(24px, 6vh, 60px); }
+  .v-hero {
+    grid-template-columns: 1fr;
+    position: relative;
+  }
+  .v-hero__main {
+    grid-column: 1;
+    max-width: none;
+    padding-top: clamp(24px, 6vh, 60px);
+    justify-content: flex-start;
+  }
   .v-hero__aside { display: none; }
+  .v-hero__nav, .v-hero__main, .v-hero__foot { position: relative; z-index: 1; }
   .v-nav-links { gap: 16px; }
   .v-idx { display: none; }
+
+  /* Весь первый экран на мобильном стоит прямо над центрированным облаком
+     частиц (на десктопе оно уезжает в правую колонку и не мешает). Один
+     блюр-слой на всю секцию, а не подложка под отдельным блоком, — так нет
+     резкой прямоугольной границы посреди анимации: маска гасит его к краям
+     экрана плавно, растушёвкой, а не обрезает жёстким прямоугольником. */
+  .v-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    background: rgba(14, 14, 14, 0.42);
+    -webkit-mask-image: radial-gradient(120% 100% at 50% 42%, black 55%, transparent 100%);
+    mask-image: radial-gradient(120% 100% at 50% 42%, black 55%, transparent 100%);
+    pointer-events: none;
+  }
 }
 
 @media (max-width: 620px) {

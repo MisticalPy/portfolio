@@ -348,9 +348,15 @@
       boxW = container.clientWidth || window.innerWidth;
       boxH = container.clientHeight || window.innerHeight;
       var wide = boxW > 900;
+      // На узких экранах текст растягивается на всю ширину и садится там,
+      // где раньше была правая колонка — если оставить облако по центру,
+      // оно ложится прямо на текст и делает его нечитаемым. Уводим форму
+      // вниз, под текстовый блок, и отодвигаем камеру, чтобы она читалась
+      // как декоративный фон, а не мешала строкам.
       points.position.x = wide ? 0.62 : 0;
+      points.position.y = wide ? 0 : -1.35;
       camera.aspect = boxW / boxH;
-      camera.position.z = wide ? 5 : 6.2;
+      camera.position.z = wide ? 5 : 7.4;
       camera.updateProjectionMatrix();
       renderer.setSize(boxW, boxH);
       material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
