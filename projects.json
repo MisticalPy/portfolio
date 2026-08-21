@@ -1,0 +1,26 @@
+[
+  {
+    "id": "proj-1",
+    "title": "Sprint Task Tracker",
+    "year": "2026",
+    "img": "./assets/sprint-task-tracker.png",
+    "url": "https://gitlab.com/django_pet_project1/sprint-task-tracker",
+    "detailUrl": "./Project-SprintTaskTracker.dc.html",
+    "stack": "Python · Django · DRF · PostgreSQL · Docker",
+    "tags": ["Django", "DRF", "Vue 3", "Celery", "Redis", "Docker", "JWT"],
+    "descriptionRu": "Fullstack pet-проект: трекер задач по спринтам с самостоятельно спроектированной архитектурой — JWT-аутентификация под SPA, Celery+Redis для фоновых задач, CI через GitHub Actions, интеграция с Anthropic API.",
+    "descriptionEn": "A fullstack pet project: a sprint task tracker with a self-designed architecture — JWT auth for an SPA setup, Celery+Redis for background jobs, CI via GitHub Actions, and an Anthropic API integration."
+  },
+  {
+    "id": "proj-2",
+    "title": "KohiAnime",
+    "year": "2026",
+    "img": "./assets/kohianime.png",
+    "url": "https://gitlab.com/django_pet_project1/KohiAnime",
+    "detailUrl": "./Project-KohiAnime.dc.html",
+    "stack": "Python · Async · PostgreSQL/MongoDB · Playwright · Redis",
+    "tags": ["Django", "Bootstrap", "CI/CD", "PostgreSQL"],
+    "descriptionRu": "Каталог аниме на Django с фильтрами, пользовательскими профилями и кастомной админкой. Первый крупный проект — архитектура с нуля, кастомный middleware, CI/CD с первого дня.",
+    "descriptionEn": "An anime catalog built on Django with filters, user profiles, and a custom admin. My first large project — architecture from scratch, a custom middleware, and CI/CD from day one."
+  }
+]
